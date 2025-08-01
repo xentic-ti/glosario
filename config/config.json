@@ -1,0 +1,18 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "glosario-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/glosario/GlosarioWebPart.js",
+          "manifest": "./src/webparts/glosario/GlosarioWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "GlosarioWebPartStrings": "lib/webparts/glosario/loc/{locale}.js"
+  }
+}
