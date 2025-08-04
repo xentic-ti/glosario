@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { IGlosarioProps } from './IGlosarioProps';
 import styles from './Glosario.module.scss';
-import { SPFI, spfi } from '@pnp/sp';
+import { SPFI } from '@pnp/sp';
 import { getSP } from '../../../pnpjsConfig';
 import "@pnp/sp/items";
 import "@pnp/sp/lists";

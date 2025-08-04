@@ -3,6 +3,7 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import Glosario from './components/Glosario';
 import { IGlosarioProps } from './components/IGlosarioProps';
+import { PropertyPaneSlider } from '@microsoft/sp-property-pane';
 
 export default class GlosarioWebPart extends BaseClientSideWebPart<IGlosarioProps> {
   public render(): void {
