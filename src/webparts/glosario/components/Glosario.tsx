@@ -1,43 +1,68 @@
 import * as React from 'react';
+import { IGlosarioProps } from './IGlosarioProps';
 import styles from './Glosario.module.scss';
-import type { IGlosarioProps } from './IGlosarioProps';
-import { escape } from '@microsoft/sp-lodash-subset';
+import { SPFI, spfi } from '@pnp/sp';
+import { getSP } from '../../../pnpjsConfig';
+import "@pnp/sp/items";
+import "@pnp/sp/lists";
 
-export default class Glosario extends React.Component<IGlosarioProps, {}> {
-  public render(): React.ReactElement<IGlosarioProps> {
-    const {
-      description,
-      isDarkTheme,
-      environmentMessage,
-      hasTeamsContext,
-      userDisplayName
-    } = this.props;
-
-    return (
-      <section className={`${styles.glosario} ${hasTeamsContext ? styles.teams : ''}`}>
-        <div className={styles.welcome}>
-          <img alt="" src={isDarkTheme ? require('../assets/welcome-dark.png') : require('../assets/welcome-light.png')} className={styles.welcomeImage} />
-          <h2>Well done, {escape(userDisplayName)}!</h2>
-          <div>{environmentMessage}</div>
-          <div>Web part property value: <strong>{escape(description)}</strong></div>
-        </div>
-        <div>
-          <h3>Welcome to SharePoint Framework!</h3>
-          <p>
-            The SharePoint Framework (SPFx) is a extensibility model for Microsoft Viva, Microsoft Teams and SharePoint. It&#39;s the easiest way to extend Microsoft 365 with automatic Single Sign On, automatic hosting and industry standard tooling.
-          </p>
-          <h4>Learn more about SPFx development:</h4>
-          <ul className={styles.links}>
-            <li><a href="https://aka.ms/spfx" target="_blank" rel="noreferrer">SharePoint Framework Overview</a></li>
-            <li><a href="https://aka.ms/spfx-yeoman-graph" target="_blank" rel="noreferrer">Use Microsoft Graph in your solution</a></li>
-            <li><a href="https://aka.ms/spfx-yeoman-teams" target="_blank" rel="noreferrer">Build for Microsoft Teams using SharePoint Framework</a></li>
-            <li><a href="https://aka.ms/spfx-yeoman-viva" target="_blank" rel="noreferrer">Build for Microsoft Viva Connections using SharePoint Framework</a></li>
-            <li><a href="https://aka.ms/spfx-yeoman-store" target="_blank" rel="noreferrer">Publish SharePoint Framework applications to the marketplace</a></li>
-            <li><a href="https://aka.ms/spfx-yeoman-api" target="_blank" rel="noreferrer">SharePoint Framework API reference</a></li>
-            <li><a href="https://aka.ms/m365pnp" target="_blank" rel="noreferrer">Microsoft 365 Developer Community</a></li>
-          </ul>
-        </div>
-      </section>
-    );
-  }
+interface IGlosarioItem {
+  Title: string;
+  Descripcion: string;
 }
+
+const abecedario = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ".split('');
+
+const Glosario: React.FC<IGlosarioProps> = ({ itemsPerPage, context }) => {
+  const [sp] = React.useState<SPFI>(getSP(context));
+  const [items, setItems] = React.useState<IGlosarioItem[]>([]);
+  const [filtered, setFiltered] = React.useState<IGlosarioItem[]>([]);
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [letter, setLetter] = React.useState<string | null>(null);
+  const [page, setPage] = React.useState(1);
+
+  React.useEffect(() => {
+    sp.web.lists.getByTitle("Glosario").items.select("Title", "Descripcion").top(4999)().then(setItems);
+  }, []);
+
+  React.useEffect(() => {
+    let result = [...items];
+    if (searchTerm) result = result.filter(i => i.Title.toLowerCase().includes(searchTerm.toLowerCase()));
+    if (letter) result = result.filter(i => i.Title.toUpperCase().startsWith(letter));
+    setFiltered(result);
+    setPage(1);
+  }, [items, searchTerm, letter]);
+
+  const paginated = filtered.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+
+  return (
+    <div className={styles.glosario}>
+      <input type="text" placeholder="Buscar término..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+      
+      <div className={styles.abecedario}>
+        {abecedario.map(l => (
+          <button key={l} onClick={() => setLetter(l)} className={letter === l ? styles.selected : ''}>{l}</button>
+        ))}
+        <button onClick={() => setLetter(null)}>Todos</button>
+      </div>
+
+      <ul>
+        {paginated.map((item, idx) => (
+          <li key={idx}>
+            <strong>{item.Title}</strong><br />
+            <span>{item.Descripcion}</span>
+          </li>
+        ))}
+      </ul>
+
+      <div className={styles.paginacion}>
+        <button disabled={page <= 1} onClick={() => setPage(p => p - 1)}>← Anterior</button>
+        <span>Página {page} de {totalPages}</span>
+        <button disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>Siguiente →</button>
+      </div>
+    </div>
+  );
+};
+
+export default Glosario;
