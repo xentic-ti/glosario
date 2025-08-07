@@ -1,4 +1,8 @@
 .glosario {
+  max-width: 800px;       // Ajusta el ancho máximo
+  margin: 0 auto;         // Centra el contenedor horizontalmente
+  padding: 10px;          // Espaciado interno general
+
   input {
     width: 100%;
     padding: 8px;
