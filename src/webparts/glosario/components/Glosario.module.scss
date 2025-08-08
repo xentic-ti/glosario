@@ -1,12 +1,17 @@
 .glosario {
-  max-width: 800px;       // Ajusta el ancho máximo
-  margin: 0 auto;         // Centra el contenedor horizontalmente
-  padding: 10px;          // Espaciado interno general
+  width: 100%;
+  max-width: 100%;     // ✅ evita límites horizontales
+  padding-right: 8px; // ✅ solo aplica padding derecho
+  padding-left: 0;      // ❌ sin margen izquierdo
+  box-sizing: border-box;
 
   input {
     width: 100%;
     padding: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
   }
 
   .abecedario {
